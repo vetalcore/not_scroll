@@ -1,0 +1,131 @@
+var wrap = function(element) {
+
+  element.style.position = 'relative';
+  element.style.boxSizing = 'border-box';
+  element.style.overflow = 'hidden';
+
+  var newWrapper = document.createElement('div');
+  newWrapper.setAttribute('class', 'custom_scroll_container');
+
+  newWrapper.style.height = '100%';
+  newWrapper.style.width = '100%';
+  newWrapper.style.boxSizing = 'border-box';
+  newWrapper.style.overflow = 'hidden';
+
+  var arrayOfChildNodes = element.childNodes;
+  for (var i = 0; i < arrayOfChildNodes.length; ++i) {
+      newWrapper.appendChild(arrayOfChildNodes[i]);
+  }
+
+  element.appendChild(newWrapper);
+  appendScroll(element);
+  emulateScrollEvent(element);
+}
+
+appendScroll = function(element, scrollOptions){
+    var scrollOverlay = document.createElement('div'),
+      scroll = document.createElement('div'),
+      thumb = document.createElement('div');
+
+    scrollOverlay.setAttribute('class', 'scroll_overlay');
+    scroll.setAttribute('class', 'scroll');
+    thumb.setAttribute('class', 'thumb');
+
+    scroll.appendChild(thumb);
+    scrollOverlay.appendChild(scroll);
+
+    element.appendChild(scrollOverlay);
+
+    // TODO: set scroll prop
+    // $('#thumb').offsetHeight  -> min thumb height
+    calcScrollAppearance(element);
+}
+
+var calcScrollAppearance = function (element) {
+  var timer = undefined,
+    cb = function(){
+      calculateThumbsHeight(element);
+
+      element.querySelector('.scroll_overlay').style.opacity = 1;
+
+      if(timer) {
+        clearTimeout(timer);
+      }
+
+      timer = setTimeout(function(){
+        element.querySelector('.scroll_overlay').style.opacity = 0;
+      }, 2000);
+    };
+
+  if (element.addEventListener) {
+    // crossbrovser
+    element.addEventListener("mousemove", cb)
+    // IE9, Chrome, Safari, Opera
+    element.addEventListener("mousewheel", cb, false);
+    // Firefox
+    element.addEventListener("DOMMouseScroll", cb, false);
+  }
+  // IE 6/7/8
+  else {
+    element.attachEvent("onmousewheel", cb);
+    element.attachEvent("mousemove", cb);
+  }
+}
+
+var calculateThumbsHeight = function(container) {
+  var someMinValue = 30,
+    scrollContainer = container.querySelector('.custom_scroll_container'),
+    thumbHeight = scrollContainer.offsetHeight*(scrollContainer.offsetHeight/scrollContainer.scrollHeight);
+  // TODO: add some min value property
+  container.querySelector('.thumb').style.height = ((thumbHeight < someMinValue ? someMinValue : thumbHeight) | 0) + 'px';
+}
+
+// Prevent parent scroll solution
+var emulateScrollEvent = function(element) {
+  var scrollContainer = element.querySelector('.custom_scroll_container'),
+    cb =  (function (e) {
+
+      var event = e.originalEvent || e,
+        d = event.wheelDelta || -event.detail;
+
+      this.querySelector('.custom_scroll_container').scrollTop += ( d < 0 ? 1 : -1 ) * 30;
+
+      thumbHeightOriginal = this.querySelector('.custom_scroll_container').offsetHeight*(this.querySelector('.custom_scroll_container').offsetHeight/this.querySelector('.custom_scroll_container').scrollHeight) | 0;
+      thumbHeight = this.querySelector('.thumb').offsetHeight;
+      thumbHeightErr = (this.querySelector('.custom_scroll_container').clientHeight - thumbHeight)/(this.querySelector('.custom_scroll_container').clientHeight - thumbHeightOriginal);
+
+
+      // TODO: run thump position culculation on mouse over
+      this.querySelector('.thumb').style.marginTop = ((this.querySelector('.custom_scroll_container').clientHeight*this.querySelector('.custom_scroll_container').scrollTop/this.querySelector('.custom_scroll_container').scrollHeight)* thumbHeightErr | 0) + 'px';
+      e.preventDefault();
+  }).bind(element);
+  if (scrollContainer.addEventListener) {
+    // crossbrovser
+    // scrollContainer.addEventListener("mousemove", cb)
+    // IE9, Chrome, Safari, Opera
+    scrollContainer.addEventListener("mousewheel", cb, false);
+    // Firefox
+    scrollContainer.addEventListener("DOMMouseScroll", cb, false);
+  }
+  // IE 6/7/8
+  else {
+    scrollContainer.attachEvent("onmousewheel", cb);
+    // scrollContainer.attachEvent("mousemove", cb);
+  }
+}
+
+// var scrollTopCalculation = function() {
+//   $('#thumb').on('mousedown',function(e){
+//      var thumbClickAllowance = e.clientY - ($(e.target).offset().top-$(window).scrollTop())
+//     $('.custom_scroll_container').on('scroll',function(e){
+//       $('#thumb').css('margin-top',($('.custom_scroll_container').innerHeight()*$('.custom_scroll_container').scrollTop()/$('.custom_scroll_container')[0].scrollHeight)*$('.custom_scroll_container').offsetHeight*($('.custom_scroll_container').offsetHeight/$('.custom_scroll_container')[0].scrollHeight);/$('#thumb').height() + 'px')
+//     });
+//     $('body').on('mousemove',function(e){
+//       if(($('.custom_scroll_container').offset().top-$(window).scrollTop()) <= e.clientY && ($('.custom_scroll_container').offset().top-$(window).scrollTop() + ($('.custom_scroll_container').innerHeight())) > e.clientY){
+//         // $('.custom_scroll_container').scrollTop(((e.clientY - thumbClickAllowance) - ($('.custom_scroll_container').offset().top-$(window).scrollTop()))*($('.custom_scroll_container')[0].scrollHeight/($('.custom_scroll_container').innerHeight()-$('#thumb').innerHeight())));
+//         $('.custom_scroll_container').scrollTop(((e.clientY - thumbClickAllowance) - ($('.custom_scroll_container').offset().top-$(window).scrollTop()))*($('.custom_scroll_container')[0].scrollHeight/$('.custom_scroll_container').innerHeight()));
+//       }
+//     })
+//     $('body').on('mouseup', function(e){$('body').unbind()});
+//   })
+// }
