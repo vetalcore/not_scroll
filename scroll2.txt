@@ -78,27 +78,26 @@ var calculateThumbsHeight = function(container) {
     thumbHeight = scrollContainer.offsetHeight*(scrollContainer.offsetHeight/scrollContainer.scrollHeight);
   // TODO: add some min value property
   container.querySelector('.thumb').style.height = ((thumbHeight < someMinValue ? someMinValue : thumbHeight) | 0) + 'px';
+  calcThumbPosition(container);
 }
 
 // Prevent parent scroll solution
 var emulateScrollEvent = function(element) {
   var scrollContainer = element.querySelector('.custom_scroll_container'),
-    cb =  (function (e) {
+    cb =  function (e) {
 
       var event = e.originalEvent || e,
-        d = event.wheelDelta || -event.detail;
+        d = event.wheelDelta || -event.detail,
+        scrollContainer = element.querySelector('.custom_scroll_container');
 
-      this.querySelector('.custom_scroll_container').scrollTop += ( d < 0 ? 1 : -1 ) * 30;
+      scrollContainer.scrollTop += ( d < 0 ? 1 : -1 ) * 30;
 
-      thumbHeightOriginal = this.querySelector('.custom_scroll_container').offsetHeight*(this.querySelector('.custom_scroll_container').offsetHeight/this.querySelector('.custom_scroll_container').scrollHeight) | 0;
-      thumbHeight = this.querySelector('.thumb').offsetHeight;
-      thumbHeightErr = (this.querySelector('.custom_scroll_container').clientHeight - thumbHeight)/(this.querySelector('.custom_scroll_container').clientHeight - thumbHeightOriginal);
+      calcThumbPosition(element)
 
-
-      // TODO: run thump position culculation on mouse over
-      this.querySelector('.thumb').style.marginTop = ((this.querySelector('.custom_scroll_container').clientHeight*this.querySelector('.custom_scroll_container').scrollTop/this.querySelector('.custom_scroll_container').scrollHeight)* thumbHeightErr | 0) + 'px';
-      e.preventDefault();
-  }).bind(element);
+      if ( (scrollContainer.offsetHeight !== (scrollContainer.scrollHeight - scrollContainer.scrollTop ) && d < 0) || (scrollContainer.scrollTop !== 0 && d > 0) ) {
+        e.preventDefault();
+      }
+    };
   if (scrollContainer.addEventListener) {
     // crossbrovser
     // scrollContainer.addEventListener("mousemove", cb)
@@ -112,6 +111,15 @@ var emulateScrollEvent = function(element) {
     scrollContainer.attachEvent("onmousewheel", cb);
     // scrollContainer.attachEvent("mousemove", cb);
   }
+}
+
+var calcThumbPosition = function(element) {
+  var customContainer = element.querySelector('.custom_scroll_container'),
+    thumbHeightOriginal = customContainer.offsetHeight*(customContainer.offsetHeight/customContainer.scrollHeight) | 0,
+    thumbHeight = element.querySelector('.thumb').offsetHeight,
+    thumbHeightErr = (customContainer.clientHeight - thumbHeight)/(customContainer.clientHeight - thumbHeightOriginal);
+
+  element.querySelector('.thumb').style.marginTop = ((customContainer.clientHeight*customContainer.scrollTop/customContainer.scrollHeight)* thumbHeightErr | 0) + 'px';
 }
 
 // var scrollTopCalculation = function() {
