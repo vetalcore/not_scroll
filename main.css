@@ -17,6 +17,7 @@
   box-sizing: border-box;
   height: 100%;
   margin-left: 5px;
+  position: relative;
   width: 10px;
 }
 
@@ -26,5 +27,6 @@
   border-radius:10px;
   box-sizing: border-box;
   height: 30px;
+  position: absolute;
   width: 100%;
 }
