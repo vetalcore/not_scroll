@@ -1,0 +1,34 @@
+{
+  "name": "custom-js-scroll",
+  "description": "Custom pure js scroll",
+  "version": "0.0.1",
+  "homepage": "https://github.com/vetalcore/not_scroll",
+  "authors": [
+    {
+      "name": "Vitalii Vozniak",
+      "homepage": "https://github.com/vetalcore"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vetalcore/not_scroll.git"
+  },
+  "keywords": [
+    "js",
+    "pure",
+    "polyfill"
+    "scroll"
+  ],
+  "license": [
+    "https://github.com/cvn/angular-shims-placeholder/LICENSE-MIT.txt"
+  ],
+  "main": [
+    "./scroll2.js"
+  ],
+  "ignore": [
+  ],
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}
