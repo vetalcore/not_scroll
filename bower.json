@@ -20,7 +20,6 @@
     "scroll"
   ],
   "license": [
-    "https://github.com/cvn/angular-shims-placeholder/LICENSE-MIT.txt"
   ],
   "main": [
     "./scroll2.js"
